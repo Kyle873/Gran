@@ -9,13 +9,17 @@
 #include "Nova.h"
 #include "CSV.h"
 
-#define MENU_WIDTH          (SCREEN_WIDTH / 4)
-#define MENU_HEIGHT         ((SCREEN_HEIGHT / 2) - 56)
-#define MENU_X              ((SCREEN_WIDTH / 2) - (MENU_WIDTH / 2))
-#define MENU_Y              ((SCREEN_HEIGHT / 2) - (MENU_HEIGHT / 2))
+#define MENU_WIDTH                  (SCREEN_WIDTH / 4)
+#define MENU_HEIGHT                 ((SCREEN_HEIGHT / 2) - 56)
+#define MENU_X                      ((SCREEN_WIDTH / 2) - (MENU_WIDTH / 2))
+#define MENU_Y                      ((SCREEN_HEIGHT / 2) - (MENU_HEIGHT / 2))
 
-#define MENU_MAX_ENTRIES    (20)
-#define MENU_MAX_OPTIONS    (8)
+#define MENU_MAX_ENTRIES            (20)
+#define MENU_MAX_OPTIONS            (8)
+
+#define MENU_STRING_SIZE            (64)
+
+#define GenDataEntryPtr(page, n)    &menuEntries[MENU_PAGE_##page][MENU_##page##_DATA + n]
 
 enum
 {
@@ -83,7 +87,7 @@ struct
     
     int index[MENU_PAGE_MAX];
     int page;
-    int size;
+    size_t size;
     int increment;
     
     int itemSlot;

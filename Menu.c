@@ -91,7 +91,7 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
             .type = MENU_ENTRY_NUMERIC,
             .value = 1,
             .min = 1,
-            .max = 200,
+            .max = MAX_INV_ENTRIES,
             .change = Menu_ItemEdit_Slot_Change,
         },
         {
@@ -109,21 +109,21 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
             .type = MENU_ENTRY_NUMERIC,
             .dataType = MEMORY_SHORT,
             .min = 0,
-            .max = MAX_ITEM_TYPES,
+            .max = MAX_ITEM_TYPES - 1,
         },
         {
             .name = "Category",
             .type = MENU_ENTRY_NUMERIC,
             .dataType = MEMORY_INT,
             .min = 0,
-            .max = 10000,
+            .max = 0,
         },
         {
             .name = "ID",
             .type = MENU_ENTRY_NUMERIC,
             .dataType = MEMORY_SHORT,
             .min = 0,
-            .max = 10000,
+            .max = 1000,
         },
         {
             .type = MENU_ENTRY_SEPERATOR,
@@ -175,6 +175,23 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
         },
     },
 };
+
+// Temporary!
+void Menu_TestPopulateItems()
+{
+    int type = menuEntries[MENU_PAGE_ITEMEDIT][MENU_ITEMEDIT_TYPE].value;
+    int category = menuEntries[MENU_PAGE_ITEMEDIT][MENU_ITEMEDIT_CATEGORY].value;
+    
+    for (int i = 0; i < MAX_STORAGE_ENTRIES; i++)
+    {
+        uint32_t address = ADDR_STORAGE + (i * ITEM_SIZE);
+        
+        Memory_WriteInt(address, i + 10000);
+        Memory_WriteShort(address + 4, type);
+        Memory_WriteInt(address + 6, category);
+        Memory_WriteShort(address + 10, i);
+    }
+}
 
 void Menu_Init()
 {
@@ -302,10 +319,13 @@ void Menu_Input()
         slot->change();
         
         if (menu.storage)
-            slot->max = 2000;
+            slot->max = MAX_STORAGE_ENTRIES;
         else
-            slot->max = 200;
+            slot->max = MAX_INV_ENTRIES;
     }
+    
+    if (pressedButtons == SCE_CTRL_TRIANGLE && menu.page == MENU_PAGE_ITEMEDIT)
+        Menu_TestPopulateItems();
     
     if (modified && entry->change == NULL)
     {
@@ -488,25 +508,27 @@ void Menu_Main_Select()
 
 void Menu_ItemEdit_Update()
 {
-    #define GenDataEntry(page, n) &menuEntries[MENU_PAGE_##page][MENU_##page##_DATA + n]
-    
+    MenuEntry *slot = &menuEntries[MENU_PAGE_ITEMEDIT][MENU_ITEMEDIT_SLOT];
     MenuEntry *GUID = &menuEntries[MENU_PAGE_ITEMEDIT][MENU_ITEMEDIT_GUID];
     MenuEntry *type = &menuEntries[MENU_PAGE_ITEMEDIT][MENU_ITEMEDIT_TYPE];
     MenuEntry *category = &menuEntries[MENU_PAGE_ITEMEDIT][MENU_ITEMEDIT_CATEGORY];
     MenuEntry *ID = &menuEntries[MENU_PAGE_ITEMEDIT][MENU_ITEMEDIT_ID];
     MenuEntry *data[] =
     {
-        GenDataEntry(ITEMEDIT, 0),
-        GenDataEntry(ITEMEDIT, 1),
-        GenDataEntry(ITEMEDIT, 2),
-        GenDataEntry(ITEMEDIT, 3),
-        GenDataEntry(ITEMEDIT, 4),
-        GenDataEntry(ITEMEDIT, 5),
-        GenDataEntry(ITEMEDIT, 6),
-        GenDataEntry(ITEMEDIT, 7),
+        GenDataEntryPtr(ITEMEDIT, 0),
+        GenDataEntryPtr(ITEMEDIT, 1),
+        GenDataEntryPtr(ITEMEDIT, 2),
+        GenDataEntryPtr(ITEMEDIT, 3),
+        GenDataEntryPtr(ITEMEDIT, 4),
+        GenDataEntryPtr(ITEMEDIT, 5),
+        GenDataEntryPtr(ITEMEDIT, 6),
+        GenDataEntryPtr(ITEMEDIT, 7),
     };
     int dataIndex = 0;
     uint32_t address;
+    CSVItemType *csvType = CSV_Get_ItemType(type->value);
+    CSVItemCategory *csvCategory = CSV_Get_ItemCategory(type->value, category->value);
+    CSVItemName *csvName = CSV_Get_ItemName(type->value, category->value, ID->value);
     
     if (menu.storage)
         address = ADDR_STORAGE + ((menu.itemSlot - 1) * ITEM_SIZE);
@@ -519,6 +541,34 @@ void Menu_ItemEdit_Update()
     type->address = menu.item.base.type;
     category->address = menu.item.base.category;
     ID->address = menu.item.base.ID;
+    
+    if (csvType != NULL)
+    {
+        type->suffix = malloc(MENU_STRING_SIZE);
+        sprintf(type->suffix, " (%s)", csvType->name);
+        category->max = csvType->max;
+    }
+    else
+    {
+        type->suffix = NULL;
+        category->max = 0;
+    }
+    
+    if (csvCategory != NULL)
+    {
+        category->suffix = malloc(MENU_STRING_SIZE);
+        sprintf(category->suffix, " (%s)", csvCategory->name);
+    }
+    else
+        category->suffix = NULL;
+    
+    if (csvName != NULL)
+    {
+        slot->suffix = malloc(MENU_STRING_SIZE);
+        sprintf(slot->suffix, " (%s)", csvName->name);
+    }
+    else
+        slot->suffix = NULL;
     
     switch (type->value)
     {
@@ -563,8 +613,6 @@ void Menu_ItemEdit_Update()
     }
     
     menu.size = MENU_ITEMEDIT_DATA + dataIndex;
-    
-    #undef GenDataEntry
 }
 
 void Menu_ItemEdit_Slot_Change()

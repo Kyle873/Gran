@@ -59,6 +59,9 @@ int Draw_Print(const char *text)
     
     for (c = 0; text[c] != '\0'; c++)
     {
+        if (text[c] == '\r')
+            continue;
+        
         VRAM = ((uint32_t *)drawData.frameBuffer.base) + drawData.pos.x + drawData.pos.y * SCREEN_FB_WIDTH;
         font = &debugFont[(int)text[c] * 8];
         

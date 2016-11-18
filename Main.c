@@ -11,8 +11,6 @@ int Main_Thread(SceSize args, void *argp)
     
     while (true)
     {
-        // sceDisplayWaitVblankStart();
-        
         Draw_Init();
         
         Input_Update();

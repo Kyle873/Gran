@@ -13,11 +13,9 @@
 
 typedef struct
 {
-    uint32_t type;
-    uint32_t category;
-    uint32_t ID;
     char *name;
-} CSVItemName;
+    int max;
+} CSVItemType;
 
 typedef struct
 {
@@ -28,18 +26,30 @@ typedef struct
 
 typedef struct
 {
+    uint32_t type;
+    uint32_t category;
+    uint32_t ID;
+    char *name;
+} CSVItemName;
+
+typedef struct
+{
     uint32_t ID;
     char *name;
 } CSVAffixInfo;
 
-extern CSVItemName *ItemNames;
-extern char *ItemTypes[];
+extern CSVItemType *ItemTypes;
 extern CSVItemCategory *ItemCategories;
+extern CSVItemName *ItemNames;
 
 char *CSV_GetData(const char *);
 
 void CSV_Parse_ItemNames();
 void CSV_Parse_ItemTypes();
 void CSV_Parse_ItemCategories();
+
+CSVItemType *CSV_Get_ItemType(uint32_t);
+CSVItemCategory *CSV_Get_ItemCategory(uint32_t, uint32_t);
+CSVItemName *CSV_Get_ItemName(uint32_t, uint32_t, uint32_t);
 
 #endif // CSV_H
