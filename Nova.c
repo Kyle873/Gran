@@ -13,7 +13,7 @@ void Nova_CalculateOffset()
         
         Logf("Nova_CalculateOffset: Starting on block %X (%d/%d)\n", block, num + 1, ADDR_BLOCK_MAX);
         
-        for (uint32_t offset = block; offset < block + (ADDR_BLOCK_THRESHOLD * 4); offset += 4)
+        for (uint32_t offset = block; offset < block + (ADDR_BLOCK_SIZE * 4); offset += 4)
         {
             Logf("Nova_CalculateOffset: Checking at offset %X\n", offset);
             

@@ -8,7 +8,7 @@
 #define ADDR_BLOCK_NOVA_OFFSET  (0x00100000)
 #define ADDR_BLOCK_BLANK_AOB    (0xCCCCCCCC)
 #define ADDR_BLOCK_MAX          (8)
-#define ADDR_BLOCK_THRESHOLD    (32)
+#define ADDR_BLOCK_THRESHOLD    (56)
 
 // Player
 #define ADDR_LEVEL          (0x871B0790)
