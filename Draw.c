@@ -2,7 +2,7 @@
 
 DrawData drawData;
 
-int Draw_Init()
+int Draw_Setup()
 {
     SceDisplayFrameBuf framebuf;
     framebuf.size = sizeof(SceDisplayFrameBuf);

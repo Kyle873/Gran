@@ -57,7 +57,7 @@ inline static void Draw_Pixel(uint32_t x, uint32_t y)
     ((uint32_t *)drawData.frameBuffer.base)[x + y * SCREEN_FB_WIDTH] = drawData.FGColor;
 }
 
-int Draw_Init();
+int Draw_Setup();
 
 void Draw_Clear(uint32_t);
 

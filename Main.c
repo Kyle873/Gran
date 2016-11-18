@@ -3,15 +3,15 @@
 
 int Main_Thread(SceSize args, void *argp)
 {
-    CSV_Parse_ItemNames();
     CSV_Parse_ItemTypes();
     CSV_Parse_ItemCategories();
+    CSV_Parse_ItemNames();
     
     Menu_Init();
     
     while (true)
     {
-        Draw_Init();
+        Draw_Setup();
         
         Input_Update();
         Menu_Update();
