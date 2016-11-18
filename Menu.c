@@ -206,9 +206,15 @@ void Menu_Toggle()
     menu.open = !menu.open;
     
     if (menu.open)
+    {
         Thread_PauseMainThread();
+        sceCtrlSetButtonIntercept(true);
+    }
     else
+    {
         Thread_ResumeMainThread();
+        sceCtrlSetButtonIntercept(false);
+    }
 }
 
 void Menu_Input()
@@ -353,7 +359,7 @@ void Menu_Draw()
 
 void Menu_Update()
 {
-    if ((!menu.open && currentButtons & SCE_CTRL_SELECT && pressedButtons & SCE_CTRL_L1) || (menu.open && pressedButtons & SCE_CTRL_SELECT))
+    if ((!menu.open && Input_HoldButtons(SCE_CTRL_SELECT)) || (menu.open && pressedButtons & SCE_CTRL_SELECT))
         Menu_Toggle();
     
     if (menu.open)

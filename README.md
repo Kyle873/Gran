@@ -9,7 +9,7 @@ Controls
 ========
 
 ```
-Select + L1 - Enter Menu
+Select (Hold) - Enter Menu
 
 Up/Down - Navigate
 Left/Right - Modify/Change

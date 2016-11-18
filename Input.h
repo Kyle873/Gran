@@ -8,6 +8,8 @@
 extern int pressedButtons;
 extern int currentButtons;
 
+extern int sceCtrlSetButtonIntercept(int intercept);
+
 bool Input_HoldButtons(uint32_t);
 
 void Input_Update();
