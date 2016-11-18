@@ -164,6 +164,7 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
     
     // Settings
     {
+        #if !ADDR_BLOCK_SCAN
         {
             .name = "Memory Offset",
             .type = MENU_ENTRY_NUMERIC,
@@ -173,6 +174,7 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
             .update = Menu_Settings_MemoryOffset_Update,
             .change = Menu_Settings_MemoryOffset_Change,
         },
+        #endif
     },
 };
 

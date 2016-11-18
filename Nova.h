@@ -108,6 +108,7 @@ typedef struct
     ItemData data;
 } Item;
 
+void Nova_CalculateOffset();
 void Nova_ReadItem(Item *, uint32_t);
 
 #endif // NOVA_H

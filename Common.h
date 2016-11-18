@@ -24,4 +24,7 @@
 #include "Address.h"
 #include "Log.h"
 
+// Experimental!
+#define ADDR_BLOCK_SCAN 1
+
 #endif // COMMON_H
