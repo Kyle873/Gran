@@ -1,6 +1,6 @@
-#include "Utils.h"
+#include "Log.h"
 
-void flog(const char *text)
+void Log(const char *text)
 {
     int f = sceIoOpen(LOGFILE_NAME, SCE_O_WRONLY | SCE_O_APPEND | SCE_O_CREAT, 0777);
     
@@ -9,7 +9,7 @@ void flog(const char *text)
     sceIoClose(f);
 }
 
-int flogf(const char *format, ...)
+int Logf(const char *format, ...)
 {
     char buffer[1024];
     int f = sceIoOpen(LOGFILE_NAME, SCE_O_WRONLY | SCE_O_APPEND | SCE_O_CREAT, 0777);

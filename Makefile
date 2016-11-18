@@ -4,7 +4,7 @@ OBJS    = CSV.o \
           Memory.o \
           Nova.o \
           Settings.o \
-          Utils.o \
+          Log.o \
           Font.o \
           Main.o \
           Thread.o \

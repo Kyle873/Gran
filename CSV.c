@@ -46,7 +46,7 @@ void CSV_Parse_ItemTypes()
         }
     }
     
-    flog("Done parsing Item Types\n");
+    Log("Done parsing Item Types\n");
 }
 
 void CSV_Parse_ItemCategories()
@@ -83,7 +83,7 @@ void CSV_Parse_ItemCategories()
         }
     }
     
-    flog("Done parsing Item Categories\n");
+    Log("Done parsing Item Categories\n");
 }
 
 void CSV_Parse_ItemNames()
@@ -126,7 +126,7 @@ void CSV_Parse_ItemNames()
         }
     }
     
-    flog("Done parsing Item Names\n");
+    Log("Done parsing Item Names\n");
 }
 
 CSVItemType *CSV_Get_ItemType(uint32_t type)
