@@ -25,8 +25,10 @@ enum
 {
     MENU_COLOR_BACK = 0xC0241E10,
     MENU_COLOR_BORDER = 0xC06B644E,
-    MENU_COLOR_SELECT = COLOR_CYAN,
     MENU_COLOR_TEXT = COLOR_WHITE,
+    MENU_COLOR_SELECT = COLOR_CYAN,
+    MENU_COLOR_FREEZE = COLOR_YELLOW,
+    MENU_COLOR_SELECTFREEZE = COLOR_MAGENTA,
 };
 
 enum
@@ -76,6 +78,9 @@ typedef struct
     int increment;
     bool hex;
     
+    bool freezable;
+    bool frozen;
+    
     MenuSelect select;
     MenuSelect update;
     MenuChange change;
@@ -100,13 +105,15 @@ void Menu_Toggle();
 void Menu_Input();
 void Menu_Draw();
 void Menu_Update();
-void Menu_UpdateValues();
 
 void Menu_SetSize();
 
 void Menu_DrawBack();
 void Menu_DrawTitle();
 void Menu_DrawEntries();
+
+void Menu_UpdateValues();
+void Menu_UpdateFrozenValues();
 
 void Menu_Main_Select();
 

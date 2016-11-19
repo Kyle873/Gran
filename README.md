@@ -16,6 +16,7 @@ Left/Right - Modify/Change
 Cross - Back
 Circle - Confirm/Activate
 Square - Toggle Between Inventory/Storage
+Triangle - Freeze/Unfreeze Value
 L1/R1 - Change Value Increment/Decrement
 Select - Close Menu
 ```

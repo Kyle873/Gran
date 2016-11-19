@@ -46,6 +46,7 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
             .address = ADDR_GRANENERGY,
             .min = 0,
             .max = 100000000,
+            .freezable = true,
         },
         {
             .type = MENU_ENTRY_SEPERATOR,
@@ -57,6 +58,7 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
             .address = ADDR_CURRENTHP,
             .min = 0,
             .max = 9999,
+            .freezable = true,
         },
         {
             .name = "Max HP",
@@ -72,7 +74,8 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
             .dataType = MEMORY_INT,
             .address = ADDR_CURRENTGP,
             .min = 0,
-            .max = 9999,
+            .max = 999,
+            .freezable = true,
         },
         {
             .name = "Max GP",
@@ -80,7 +83,7 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
             .dataType = MEMORY_INT,
             .address = ADDR_MAXGP,
             .min = 0,
-            .max = 9999,
+            .max = 999,
         },
     },
     
@@ -331,8 +334,11 @@ void Menu_Input()
         else
             slot->max = MAX_INV_ENTRIES;
     }
+        
+    if (pressedButtons == SCE_CTRL_TRIANGLE && entry->freezable)
+        entry->frozen = !entry->frozen;
     
-    if (pressedButtons == SCE_CTRL_TRIANGLE && menu.page == MENU_PAGE_ITEMEDIT)
+    if (pressedButtons == SCE_CTRL_R3 && menu.page == MENU_PAGE_ITEMEDIT)
         Menu_TestPopulateItems();
     
     if (modified && entry->change == NULL)
@@ -364,6 +370,8 @@ void Menu_Update()
     if ((!menu.open && Input_HoldButtons(SCE_CTRL_SELECT)) || (menu.open && pressedButtons & SCE_CTRL_SELECT))
         Menu_Toggle();
     
+    Menu_UpdateFrozenValues();
+    
     if (menu.open)
     {
         Menu_UpdateValues();
@@ -372,36 +380,6 @@ void Menu_Update()
         
         if (menu.page == MENU_PAGE_ITEMEDIT)
             Menu_ItemEdit_Update();
-    }
-}
-
-void Menu_UpdateValues()
-{
-    for (int i = 0; i < menu.size; i++)
-    {
-        MenuEntry *entry = &menuEntries[menu.page][i];
-        
-        if (entry->update != NULL)
-        {
-            entry->update();
-            continue;
-        }
-        
-        if (entry->address == 0)
-            continue;
-        
-        switch (entry->dataType)
-        {
-        case MEMORY_BYTE:
-            entry->value = Memory_ReadByte(entry->address);
-            break;
-        case MEMORY_SHORT:
-            entry->value = Memory_ReadShort(entry->address);
-            break;
-        case MEMORY_INT:
-            entry->value = Memory_ReadInt(entry->address);
-            break;
-        }
     }
 }
 
@@ -468,8 +446,12 @@ void Menu_DrawEntries()
         if (entry->name == NULL)
             continue;
         
-        if (i == menu.index[menu.page])
+        if (i == menu.index[menu.page] && entry->frozen)
+            Draw_SetFGColor(MENU_COLOR_SELECTFREEZE);
+        else if (i == menu.index[menu.page])
             Draw_SetFGColor(MENU_COLOR_SELECT);
+        else if (entry->frozen)
+            Draw_SetFGColor(MENU_COLOR_FREEZE);
         else
             Draw_SetFGColor(MENU_COLOR_TEXT);
         
@@ -505,6 +487,61 @@ void Menu_DrawEntries()
             break;
         }
     }
+}
+
+void Menu_UpdateValues()
+{
+    for (int i = 0; i < menu.size; i++)
+    {
+        MenuEntry *entry = &menuEntries[menu.page][i];
+        
+        if (entry->update != NULL)
+        {
+            entry->update();
+            continue;
+        }
+        
+        if (entry->address == 0)
+            continue;
+        
+        switch (entry->dataType)
+        {
+        case MEMORY_BYTE:
+            entry->value = Memory_ReadByte(entry->address);
+            break;
+        case MEMORY_SHORT:
+            entry->value = Memory_ReadShort(entry->address);
+            break;
+        case MEMORY_INT:
+            entry->value = Memory_ReadInt(entry->address);
+            break;
+        }
+    }
+}
+
+void Menu_UpdateFrozenValues()
+{
+    for (int i = 0; i < MENU_PAGE_MAX; i++)
+        for (int j = 0; j < menu.size; j++)
+        {
+            MenuEntry *entry = &menuEntries[i][j];
+            
+            if (!entry->freezable || !entry->frozen)
+                continue;
+            
+            switch (entry->dataType)
+            {
+            case MEMORY_BYTE:
+                Memory_WriteByte(entry->address, entry->value);
+                break;
+            case MEMORY_SHORT:
+                Memory_WriteShort(entry->address, entry->value);
+                break;
+            case MEMORY_INT:
+                Memory_WriteInt(entry->address, entry->value);
+                break;
+            }
+        }
 }
 
 void Menu_Main_Select()
