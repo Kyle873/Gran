@@ -11,11 +11,21 @@
 #define SCREEN_GLYPH_W      (8)
 #define SCREEN_GLYPH_H      (8)
 
-#define COLOR_DEFAULT_FG    COLOR_WHITE
-#define COLOR_DEFAULT_BG    COLOR_NONE
+#define COLOR_DEFAULT_FG    (COLOR_WHITE)
+#define COLOR_DEFAULT_BG    (COLOR_NONE)
+
+#define COLOR_MASK_ALPHA    (0x00FFFFFF)
+#define COLOR_MASK_RED      (0xFF00FFFF)
+#define COLOR_MASK_GREEN    (0xFFFF00FF)
+#define COLOR_MASK_BLUE     (0xFFFFFF00)
 
 // Because C11 doesn't include this
 #define M_PI                (3.14159265358979323846)
+
+#define SetColorAlphaByte(color, byte)  (((color) & COLOR_MASK_ALPHA) | ((byte) << 24))
+#define SetColorRedByte(color, byte)    (((color) & COLOR_MASK_RED) | ((byte) << 16))
+#define SetColorGreenByte(color, byte)  (((color) & COLOR_MASK_GREEN) | ((byte) << 8))
+#define SetColorBlueByte(color, byte)   (((color) & COLOR_MASK_BLUE) | (byte))
 
 enum
 {

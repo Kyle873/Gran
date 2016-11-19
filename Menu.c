@@ -446,15 +446,19 @@ void Menu_DrawEntries()
         if (entry->name == NULL)
             continue;
         
-        if (i == menu.index[menu.page] && entry->frozen)
-            Draw_SetFGColor(MENU_COLOR_SELECTFREEZE);
-        else if (i == menu.index[menu.page])
-            Draw_SetFGColor(MENU_COLOR_SELECT);
-        else if (entry->frozen)
-            Draw_SetFGColor(MENU_COLOR_FREEZE);
-        else
-            Draw_SetFGColor(MENU_COLOR_TEXT);
+        float time = sin((float)sceKernelGetProcessTimeWide() / (1000.0f * 250.0f));
+        uint32_t color;
         
+        if (i == menu.index[menu.page] && entry->frozen)
+            color = SetColorGreenByte(MENU_COLOR_SELECTFREEZE, (uint8_t)(128 + (time * 127))) | SetColorBlueByte(MENU_COLOR_SELECTFREEZE, (uint8_t)(128 + (time * 127)));
+        else if (i == menu.index[menu.page])
+            color = SetColorRedByte(MENU_COLOR_SELECT, (uint8_t)(224 + (time * 31)));
+        else if (entry->frozen)
+            color = SetColorGreenByte(MENU_COLOR_FREEZE, (uint8_t)(192 + (time * 63)));
+        else
+            color = MENU_COLOR_TEXT;
+        
+        Draw_SetFGColor(color);
         Draw_SetPosition(MENU_X + 8, MENU_Y + 48 + (i * SCREEN_GLYPH_H));
         
         Draw_Print(entry->name);
