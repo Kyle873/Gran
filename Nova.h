@@ -28,6 +28,11 @@ enum
     ITEM_TYPE_CORE,
 };
 
+enum
+{
+    BURST_FLAG_ACTIVE,
+}
+
 // Structures hold addresses to the data, not the data itself!
 
 typedef struct
@@ -107,6 +112,17 @@ typedef struct
     ItemBase base;
     ItemData data;
 } Item;
+
+typedef struct
+{
+    uint32_t chainAmount;
+    uint32_t chainAmountBase;
+    uint32_t unknown;
+    uint32_t damageMultiplierAdd;
+    uint32_t chainTimer;
+    uint32_t burstFlags;
+    uint32_t burstGauge;
+} ChainData;
 
 void Nova_CalculateOffset();
 void Nova_ReadItem(Item *, uint32_t);
