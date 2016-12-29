@@ -26,12 +26,13 @@ enum
     ITEM_TYPE_ATTACHMENT,
     ITEM_TYPE_SHIELD,
     ITEM_TYPE_CORE,
+    ITEM_TYPE_GRAN,
 };
 
 enum
 {
     BURST_FLAG_ACTIVE,
-}
+};
 
 // Structures hold addresses to the data, not the data itself!
 

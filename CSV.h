@@ -9,7 +9,7 @@
 
 #define CSV_STRING_SIZE         (256)
 
-#define MAX_ITEM_TYPES          (7)
+#define MAX_ITEM_TYPES          (8)
 
 typedef struct
 {

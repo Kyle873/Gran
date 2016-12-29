@@ -639,6 +639,7 @@ void Menu_ItemEdit_Update()
             data[i]->name = NULL;
         break;
     case ITEM_TYPE_GENERAL:
+    case ITEM_TYPE_GRAN:
         data[dataIndex]->name = "Flags";
         data[dataIndex]->dataType = MEMORY_BYTE,
         data[dataIndex]->address = menu.item.data.general.flags;
