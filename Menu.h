@@ -82,7 +82,7 @@ typedef struct
     bool frozen;
     
     MenuSelect select;
-    MenuSelect update;
+    MenuUpdate update;
     MenuChange change;
 } MenuEntry;
 
