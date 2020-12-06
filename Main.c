@@ -7,10 +7,6 @@ int Main_Thread(SceSize args, void *argp)
     CSV_Parse_ItemCategories();
     CSV_Parse_ItemNames();
     
-    #if ADDR_BLOCK_SCAN
-    Nova_CalculateOffset();
-    #endif
-    
     Menu_Init();
     
     while (true)

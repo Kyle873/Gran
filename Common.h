@@ -13,18 +13,14 @@
 #include <psp2/types.h>
 #include <psp2/ctrl.h>
 #include <psp2/display.h>
-
 #include <psp2/io/dirent.h>
 #include <psp2/io/fcntl.h>
 #include <psp2/io/stat.h>
-
 #include <psp2/kernel/processmgr.h>
 
 #include "Settings.h"
 #include "Address.h"
+#include "Memory.h"
 #include "Log.h"
-
-// Experimental!
-#define ADDR_BLOCK_SCAN 1
 
 #endif // COMMON_H

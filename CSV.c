@@ -4,16 +4,22 @@ CSVItemType *ItemTypes;
 CSVItemCategory *ItemCategories;
 CSVItemName *ItemNames;
 
+size_t ItemCategoriesSize = 0;
+size_t ItemNamesSize = 0;
+
 char *CSV_GetData(const char *fileName)
 {
-    int f = sceIoOpen(fileName, SCE_O_RDONLY, 0777);
-    SceIoStat stat;
+    FILE *f = fopen(fileName, "rb");
     char *data;
+    int size;
     
-    sceIoGetstat(fileName, &stat);
-    data = malloc(stat.st_size);
-    sceIoRead(f, data, stat.st_size);
-    sceIoClose(f);
+    fseek(f, 0, SEEK_END);
+    size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    
+    data = (char *)malloc(size);
+    fread(data, size, 1, f);
+    fclose(f);
     
     return data;
 }
@@ -25,7 +31,7 @@ void CSV_Parse_ItemTypes()
     size_t size = 0;
     int segment = 0;
     
-    for (char *token; (token = strsep(&data, delimiters)) != NULL;)
+    for (char *token; (token = strsep(&data, delimiters));)
     {
         ItemTypes = realloc(ItemTypes, sizeof(CSVItemType) * (size + 1));
         CSVItemType *type = &ItemTypes[size];
@@ -56,7 +62,7 @@ void CSV_Parse_ItemCategories()
     size_t size = 0;
     int segment = 0;
     
-    for (char *token; (token = strsep(&data, delimiters)) != NULL;)
+    for (char *token; (token = strsep(&data, delimiters));)
     {
         ItemCategories = realloc(ItemCategories, sizeof(CSVItemCategory) * (size + 1));
         CSVItemCategory *category = &ItemCategories[size];
@@ -83,6 +89,8 @@ void CSV_Parse_ItemCategories()
         }
     }
     
+	ItemCategoriesSize = size;
+	
     Log("Done parsing Item Categories\n");
 }
 
@@ -93,7 +101,7 @@ void CSV_Parse_ItemNames()
     size_t size = 0;
     int segment = 0;
     
-    for (char *token; (token = strsep(&data, delimiters)) != NULL;)
+    for (char *token; (token = strsep(&data, delimiters));)
     {
         ItemNames = realloc(ItemNames, sizeof(CSVItemName) * (size + 1));
         CSVItemName *name = &ItemNames[size];
@@ -126,6 +134,8 @@ void CSV_Parse_ItemNames()
         }
     }
     
+	ItemNamesSize = size;
+	
     Log("Done parsing Item Names\n");
 }
 
@@ -136,26 +146,16 @@ CSVItemType *CSV_Get_ItemType(uint32_t type)
 
 CSVItemCategory *CSV_Get_ItemCategory(uint32_t type, uint32_t category)
 {
-    size_t size = 0;
-    
-    while ((&ItemCategories[size])->name != NULL)
-        size++;
-    
-    for (int i = 0; i < size; i++)
+	for (int i = 0; i < ItemCategoriesSize; i++)
         if ((&ItemCategories[i])->type == type && (&ItemCategories[i])->category == category)
             return &ItemCategories[i];
     
-    return NULL;
+	return NULL;
 }
 
 CSVItemName *CSV_Get_ItemName(uint32_t type, uint32_t category, uint32_t ID)
 {
-    size_t size = 0;
-    
-    while ((&ItemNames[size])->name != NULL)
-        size++;
-    
-    for (int i = 0; i < size - 1; i++)
+	for (int i = 0; i < ItemNamesSize; i++)
         if ((&ItemNames[i])->type == type && (&ItemNames[i])->category == category && (&ItemNames[i])->ID == ID)
             return &ItemNames[i];
     

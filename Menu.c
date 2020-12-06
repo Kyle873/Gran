@@ -1,5 +1,19 @@
 #include "Menu.h"
 
+struct
+{
+    bool open;
+    
+    int index[MENU_PAGE_MAX];
+    int page;
+    size_t size;
+    int increment;
+    
+    int itemSlot;
+    Item item;
+    bool storage;
+} menu;
+
 MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
 {
     // Main Menu
@@ -12,10 +26,12 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
             .name = "Inventory/Storage",
             .select = Menu_Main_Select,
         },
+        /*
         {
             .name = "Settings",
             .select = Menu_Main_Select,
         },
+        */
     },
     
     // Player
@@ -105,7 +121,7 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
             .type = MENU_ENTRY_NUMERIC,
             .dataType = MEMORY_INT,
             .min = 0,
-            .max = 1000000,
+            .max = 1000000000,
         },
         {
             .name = "Type",
@@ -126,7 +142,7 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
             .type = MENU_ENTRY_NUMERIC,
             .dataType = MEMORY_SHORT,
             .min = 0,
-            .max = 1000,
+            .max = 9999,
         },
         {
             .type = MENU_ENTRY_SEPERATOR,
@@ -165,38 +181,11 @@ MenuEntry menuEntries[][MENU_MAX_ENTRIES] =
         },
     },
     
-    // Settings
+    /* Settings
     {
-        #if !ADDR_BLOCK_SCAN
-        {
-            .name = "Memory Offset",
-            .type = MENU_ENTRY_NUMERIC,
-            .min = 0,
-            .max = 1,
-            .increment = 1,
-            .update = Menu_Settings_MemoryOffset_Update,
-            .change = Menu_Settings_MemoryOffset_Change,
-        },
-        #endif
     },
+    */
 };
-
-// Temporary!
-void Menu_TestPopulateItems()
-{
-    int type = menuEntries[MENU_PAGE_ITEMEDIT][MENU_ITEMEDIT_TYPE].value;
-    int category = menuEntries[MENU_PAGE_ITEMEDIT][MENU_ITEMEDIT_CATEGORY].value;
-    
-    for (int i = 0; i < MAX_STORAGE_ENTRIES; i++)
-    {
-        uint32_t address = ADDR_STORAGE + (i * ITEM_SIZE);
-        
-        Memory_WriteInt(address, i + 10000);
-        Memory_WriteShort(address + 4, type);
-        Memory_WriteInt(address + 6, category);
-        Memory_WriteShort(address + 10, i);
-    }
-}
 
 void Menu_Init()
 {
@@ -224,7 +213,7 @@ void Menu_Toggle()
 
 void Menu_Input()
 {
-    MenuEntry *entry = &menuEntries[menu.page][menu.index[menu.page]];
+    MenuEntry *entry = Menu_GetEntry();
     bool modified = false;
     
     if (pressedButtons == SCE_CTRL_UP)
@@ -267,7 +256,7 @@ void Menu_Input()
                     entry->value -= menu.increment;
             }
             
-            if (entry->change != NULL)
+            if (entry->change)
                 entry->change();
             
             modified = true;
@@ -289,7 +278,7 @@ void Menu_Input()
                     entry->value += menu.increment;
             }
             
-            if (entry->change != NULL)
+            if (entry->change)
                 entry->change();
             
             modified = true;
@@ -317,9 +306,9 @@ void Menu_Input()
         }
     }
     
-    if (pressedButtons == SCE_CTRL_CIRCLE && entry->select != NULL)
+    if (pressedButtons == SCE_CTRL_CIRCLE && entry->select)
         entry->select();
-    
+
     if (pressedButtons == SCE_CTRL_SQUARE && menu.page == MENU_PAGE_ITEMEDIT)
     {
         MenuEntry *slot = &menuEntries[MENU_PAGE_ITEMEDIT][MENU_ITEMEDIT_SLOT];
@@ -338,10 +327,7 @@ void Menu_Input()
     if (pressedButtons == SCE_CTRL_TRIANGLE && entry->freezable)
         entry->frozen = !entry->frozen;
     
-    if (pressedButtons == SCE_CTRL_R3 && menu.page == MENU_PAGE_ITEMEDIT)
-        Menu_TestPopulateItems();
-    
-    if (modified && entry->change == NULL)
+    if (modified && !entry->change)
     {
         switch (entry->dataType)
         {
@@ -499,7 +485,7 @@ void Menu_UpdateValues()
     {
         MenuEntry *entry = &menuEntries[menu.page][i];
         
-        if (entry->update != NULL)
+        if (entry->update)
         {
             entry->update();
             continue;
@@ -574,12 +560,12 @@ void Menu_ItemEdit_Update()
         GenDataEntryPtr(ITEMEDIT, 7),
     };
     int dataIndex = 0;
-    uint32_t address;
+    uint32_t address = 0;
     CSVItemType *csvType = CSV_Get_ItemType(type->value);
     CSVItemCategory *csvCategory = CSV_Get_ItemCategory(type->value, category->value);
     CSVItemName *csvName = CSV_Get_ItemName(type->value, category->value, ID->value);
     
-    if (menu.storage)
+	if (menu.storage)
         address = ADDR_STORAGE + ((menu.itemSlot - 1) * ITEM_SIZE);
     else
         address = ADDR_INVENTORY + ((menu.itemSlot - 1) * ITEM_SIZE);
@@ -591,9 +577,9 @@ void Menu_ItemEdit_Update()
     category->address = menu.item.base.category;
     ID->address = menu.item.base.ID;
     
-    if (csvType != NULL)
+	if (csvType)
     {
-        type->suffix = malloc(MENU_STRING_SIZE);
+		type->suffix = malloc(MENU_STRING_SIZE);
         sprintf(type->suffix, " (%s)", csvType->name);
         category->max = csvType->max;
     }
@@ -603,15 +589,15 @@ void Menu_ItemEdit_Update()
         category->max = 0;
     }
     
-    if (csvCategory != NULL)
+	if (csvCategory)
     {
         category->suffix = malloc(MENU_STRING_SIZE);
         sprintf(category->suffix, " (%s)", csvCategory->name);
     }
     else
-        category->suffix = NULL;
-    
-    if (csvName != NULL)
+		category->suffix = NULL;
+	
+    if (csvName)
     {
         slot->suffix = malloc(MENU_STRING_SIZE);
         sprintf(slot->suffix, " (%s)", csvName->name);
@@ -635,8 +621,6 @@ void Menu_ItemEdit_Update()
         data[dataIndex]->min = 0;
         data[dataIndex]->max = SHRT_MAX;
         dataIndex++;
-        for (int i = dataIndex; i < MENU_MAX_OPTIONS; i++)
-            data[i]->name = NULL;
         break;
     case ITEM_TYPE_GENERAL:
     case ITEM_TYPE_GRAN:
@@ -650,19 +634,18 @@ void Menu_ItemEdit_Update()
         data[dataIndex]->dataType = MEMORY_SHORT,
         data[dataIndex]->address = menu.item.data.general.quantity;
         data[dataIndex]->min = 0;
-        data[dataIndex]->max = 10000;
+        data[dataIndex]->max = SHRT_MAX;
         dataIndex++;
-        for (int i = dataIndex; i < MENU_MAX_OPTIONS; i++)
-            data[i]->name = NULL;
-        break;
-    default:
-        for (int i = 0; i < MENU_MAX_OPTIONS; i++)
-            data[i]->name = NULL;
-        dataIndex--; // HACK: This will be unnecessary when all cases are filled
         break;
     }
     
+    for (int i = dataIndex; i < MENU_MAX_OPTIONS; i++)
+        data[i]->name = NULL;
+    
     menu.size = MENU_ITEMEDIT_DATA + dataIndex;
+	
+	if (dataIndex == 0)
+		menu.size--;
 }
 
 void Menu_ItemEdit_Slot_Change()
@@ -670,14 +653,7 @@ void Menu_ItemEdit_Slot_Change()
     menu.itemSlot = menuEntries[menu.page][menu.index[menu.page]].value;
 }
 
-void Menu_Settings_MemoryOffset_Update()
+MenuEntry *Menu_GetEntry()
 {
-    MenuEntry *entry = &menuEntries[menu.page][menu.index[menu.page]];
-    
-    entry->value = MemoryOffset;
-}
-
-void Menu_Settings_MemoryOffset_Change()
-{
-    MemoryOffset = menuEntries[menu.page][menu.index[menu.page]].value;
+    return &menuEntries[menu.page][menu.index[menu.page]];
 }

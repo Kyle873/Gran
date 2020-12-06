@@ -15,12 +15,11 @@ OBJS    = CSV.o \
 LIBS    = -lm \
           -lSceCtrl_stub \
           -lSceDisplay_stub \
-          -lSceKernel_stub \
           -lSceLibc_stub
 
 PREFIX  = arm-vita-eabi
 CC      = $(PREFIX)-gcc
-CFLAGS  = -Wl,-q -Wall -Wno-parentheses -O2 -g -nostartfiles -std=c11
+CFLAGS  = -Wl,-q -Wall -O2 -g -nostartfiles -std=c11
 ASFLAGS = $(CFLAGS)
 
 IP      = 192.168.0.248:1337
@@ -40,5 +39,5 @@ clean:
 	@rm -rf $(TARGET).suprx $(TARGET).velf $(TARGET).elf $(OBJS)
 
 send: $(TARGET).suprx
-	curl -T $(TARGET).suprx ftp://$(IP)/ux0:/plugins/$(TARGET).suprx
+	curl -T $(TARGET).suprx ftp://$(IP)/ur0:/tai/$(TARGET).suprx
 	@echo "$(TARGET) sent."

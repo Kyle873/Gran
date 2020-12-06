@@ -86,20 +86,6 @@ typedef struct
     MenuChange change;
 } MenuEntry;
 
-struct
-{
-    bool open;
-    
-    int index[MENU_PAGE_MAX];
-    int page;
-    size_t size;
-    int increment;
-    
-    int itemSlot;
-    Item item;
-    bool storage;
-} menu;
-
 void Menu_Init();
 void Menu_Toggle();
 void Menu_Input();
@@ -117,12 +103,9 @@ void Menu_UpdateFrozenValues();
 
 void Menu_Main_Select();
 
-void Menu_Player_Update();
-
 void Menu_ItemEdit_Update();
 void Menu_ItemEdit_Slot_Change();
 
-void Menu_Settings_MemoryOffset_Update();
-void Menu_Settings_MemoryOffset_Change();
+MenuEntry *Menu_GetEntry();
 
 #endif // MENU_H

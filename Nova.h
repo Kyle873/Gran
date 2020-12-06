@@ -2,7 +2,6 @@
 #define NOVA_H
 
 #include "Common.h"
-#include "Memory.h"
 
 #define ITEM_SIZE           (44)
 
@@ -125,7 +124,6 @@ typedef struct
     uint32_t burstGauge;
 } ChainData;
 
-void Nova_CalculateOffset();
 void Nova_ReadItem(Item *, uint32_t);
 
 #endif // NOVA_H

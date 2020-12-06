@@ -3,9 +3,9 @@
 
 #include "Common.h"
 
-#define CSV_FILE_ITEMNAMES      "ux0:/data/Gran/ItemNames.csv"
 #define CSV_FILE_ITEMTYPES      "ux0:/data/Gran/ItemTypes.csv"
 #define CSV_FILE_ITEMCATEGORIES "ux0:/data/Gran/ItemCategories.csv"
+#define CSV_FILE_ITEMNAMES      "ux0:/data/Gran/ItemNames.csv"
 
 #define CSV_STRING_SIZE         (256)
 
